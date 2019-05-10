@@ -1,0 +1,31 @@
+- name: restart postgres
+  service: name=postgresql state=restarted
+  become: yes
+
+- name: restart nginx
+  service: name=nginx state=restarted enabled=yes
+  become: yes
+
+- name: install requirements
+  pip:
+    requirements: "{{ app_dir }}/requirements.txt"
+    virtualenv: '{{venv_dir}}'
+    virtualenv_python: python3
+
+- name: collect static files
+  django_manage:
+    command: collectstatic
+    virtualenv: "{{ venv_dir }}"
+    app_path: "{{ app_dir }}"
+
+- name: migrate db
+  django_manage:
+    command: migrate
+    virtualenv: "{{ venv_dir }}"
+    app_path: "{{ app_dir }}"
+
+- name: reread supervisor
+  become: yes
+  supervisorctl:
+    name: "{{app_name}}"
+    state: present
