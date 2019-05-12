@@ -19,6 +19,12 @@ class CarModelViewset(ModelViewSet):
             return FileSerializer
         return super(CarModelViewset, self).get_serializer_class()
 
+    def get_serializer_context(self):
+        context = super(CarModelViewset, self).get_serializer_context()
+        if self.action == 'update':
+            context['fields'] = ('registration_number', 'people_capacity', 'manufacture_year',\
+                        'category', 'hybrid_or_electric', 'model_id')
+        return context
     @action(detail=False, methods=['post',], url_path='importmodels')
     def import_models(self, request):
         file = request.FILES['file']

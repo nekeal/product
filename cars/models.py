@@ -21,6 +21,8 @@ class CarModel(models.Model):
     def __str__(self):
         return self.name
 
+    class Meta:
+        unique_together = ('name', 'producer', 'type')
 
 class Car(models.Model):
     CATEGORY_CHOICES = (
