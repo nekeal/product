@@ -1,6 +1,6 @@
 - name: apply common configuration to server
   hosts: hosting
-  user: {{ deployer_user }}
+  user: "{{ deployer_user }}"
 #  remote_user: root
   roles:
     - config-server

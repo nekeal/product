@@ -1,59 +1,72 @@
 #
-- include: packages.yml
+#- include: packages.yml
+##
+#- name: Install and configure db
+#  apt: name={{item}} state=latest update_cache=yes
+#  become: yes
+#  with_items:
+#    - postgresql-11 # ubuntu 16/18/19
+#    - python-psycopg2
 #
-- name: Install and configure db
-  apt: name={{item}} state=latest
-  become: yes
-  with_items:
-    - postgresql-server
-    - postgresql-contrib
-    - postgresql-devel
-    - python-psycopg2
+#- name: Start and enable postgres
+#  service: name=postgresql enabled=yes state=started
+#  become: yes
 #
-- name: Run initdb command
-  raw: postgresql-setup initdb
-  become: yes
+#- name: Create database
+#  postgresql_db: name={{ app_name }}
+#  become: yes
+#  become_user: postgres
+#
+#- name: Configure a new postgresql user
+#  postgresql_user: db={{ app_name }}
+#                                name={{ db_user }}
+#                                password={{ db_password }}
+#                                priv=ALL
+#                                role_attr_flags=NOSUPERUSER
+#  become: yes
+#  become_user: postgres
+#  notify:
+#    - restart postgres
+#
+#- name: Creates virtualenvs directory
+#  file:
+#    path: /home/{{deployer_user}}/.virtualenvs
+#    state: directory
 
-- name: Start and enable postgres
-  service: name=postgresql enabled=yes state=started
-  become: yes
-
-- name: Create database
-  postgresql_db: name={{ app_name }}
-  become_user: postgres
-  become: yes
-
-- name: Configure a new postgresql user
-  postgresql_user: db={{ app_name }}
-                                name={{ db_user }}
-                                password={{ db_password }}
-                                priv=ALL
-                                role_attr_flags=NOSUPERUSER
-  become: yes
-  become_user: postgres
-  notify:
-    - restart postgres
-
-- name: Creates virtualenvs directory
-  file:
-    path: /home/{{deployer_user}}/.virtualenvs
-    state: directory
-
-- name: Change deploydir owner
-  file:
-    path: "{{ app_dir }}"
-    owner: "{{ deployer_user }}"
-    state: directory
-  become: yes
-
+#- name: Change deploydir owner
+#  file:
+#    path: "{{ app_dir }}"
+#    owner: "{{ deployer_user }}"
+#    state: directory
+#  become: yes
+#
+#- name: Change static files owner
+#  file:
+#      path: "{{ static_dir }}"
+#      owner: www-data
+#      state: directory
+#  become: yes
+#
+#- name: Change gunicorn log directory owner
+#  file:
+#      path: "{{ log_dir }}"
+#      owner: "{{ deployer_user }}"
+#      state: directory
+#  become: yes
 
 - name: Clone or pull the latest code
   git: repo={{ code_repository_url }}
-        dest={{ app_dir }} accept_hostkey=yes
+        dest={{ app_dir }} accept_hostkey=yes force=yes
   notify:
     - collect static files
     - migrate db
     - install requirements
+
+- name: Make manage.py executable
+  file:
+    path: "{{ app_dir }}/manage.py"
+    mode: 0777
+
 
  #configuring web server
 - name: Write nginx conf file
@@ -67,7 +80,8 @@
   become: yes
   notify:
     - restart nginx
-    -
+
+
 - name: Creates directory
   file:
     path: /var/{{app_name}}/media
@@ -78,3 +92,4 @@
 - name: Write supervisor conf file
   template: src=example-django-supervisor.conf dest=/etc/supervisor/conf.d/{{ app_name }}.conf
   notify: reread supervisor
+  become: yes

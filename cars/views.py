@@ -25,6 +25,7 @@ class CarModelViewset(ModelViewSet):
             context['fields'] = ('registration_number', 'people_capacity', 'manufacture_year',\
                         'category', 'hybrid_or_electric', 'model_id')
         return context
+
     @action(detail=False, methods=['post',], url_path='importmodels')
     def import_models(self, request):
         file = request.FILES['file']

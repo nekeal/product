@@ -10,6 +10,7 @@
       - python-pip
       - python-dev
       - python3-pip
+      - virtualenv
       - python-psycopg2
       - libsqlite3-dev
       - python3-dev
@@ -19,6 +20,7 @@
       - nginx
       - build-essential
       - axel
+      - acl #enable to enable access to tmp files for non-root users
     state: present
 
     autoclean: yes

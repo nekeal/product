@@ -13,7 +13,8 @@ code_repository_url: git@github.com:nekeal/product.git
 
 # App Directory
 app_dir: /opt/{{app_name}}
-
+static_dir: /var/www/{{ app_name }}/media/
+log_dir: /var/log/gunicorn
 # DB Configuration
 db_user: "{{app_name}}"
 db_password: 12SDdv@7F?lJ

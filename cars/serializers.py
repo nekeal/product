@@ -36,7 +36,6 @@ class CarModelSerializer(serializers.HyperlinkedModelSerializer):
 
     def __init__(self, *args, **kwargs):
         super(CarModelSerializer, self).__init__(*args, **kwargs)
-        print(kwargs['context'])
         fields = kwargs['context'].pop('fields', None)
         if fields:
             allowed = set(fields)
