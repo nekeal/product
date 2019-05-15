@@ -111,20 +111,17 @@ class TestCarModelViewset:
             "hybrid_or_electric": False,
             "model_id": car_model.id
         }
-        fields = ('registration_number', 'people_capacity', 'manufacture_year',\
-                        'category', 'hybrid_or_electric', 'model_id')
         request = api_rf.put(reverse('car-detail', args=(car.id,)), data=data)
         response = CarModelViewset.as_view({'put': 'update'})(request, pk=car.id)
         car.refresh_from_db()
-        assert True
         assert response.status_code == status.HTTP_200_OK
         assert car.model_id == car_model.id
 
     @pytest.mark.django_db
-    def test_list_car_view(self, api_rf):
+    def test_delete_car_view(self, api_rf):
         car = mommy.make(Car)
         request = api_rf.delete(reverse('car-detail', args=(car.id,)))
         response = CarModelViewset.as_view({'delete': 'destroy'})(request, pk=car.id)
         assert response.status_code == status.HTTP_204_NO_CONTENT
-        # print(response.data)
-        assert response.data == None
+        assert response.data is None
+        assert Car.objects.first() is None
