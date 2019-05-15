@@ -19,7 +19,7 @@ class CarModel(models.Model):
 
 
     def __str__(self):
-        return self.name
+        return f'{self.name} - {self.type}'
 
     class Meta:
         unique_together = ('name', 'producer', 'type')
