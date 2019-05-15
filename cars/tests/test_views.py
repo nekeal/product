@@ -3,18 +3,18 @@ import json
 from model_mommy import mommy
 from django.shortcuts import reverse
 from rest_framework import status
-from ..views import CarModelViewset
+from ..views import CarModelViewSet
 from ..serializers import CarModelSerializer
 from ..models import Car, CarModel, Producer
 
 
-class TestCarModelViewset:
+class TestCarModelViewSet:
 
     @pytest.mark.django_db
     def test_list_car_view(self, api_rf):
         request = api_rf.get(reverse('car-list'))
         car = mommy.make(Car,2)
-        response = CarModelViewset.as_view({'get':'list'})(request)
+        response = CarModelViewSet.as_view({'get':'list'})(request)
         assert response.status_code == status.HTTP_200_OK
         assert response.data == CarModelSerializer(car, context={'request': request}, many=True).data
 
@@ -30,7 +30,7 @@ class TestCarModelViewset:
             "model_id": car_model.id,
         }
         request = api_rf.post(reverse('car-list'), data=data)
-        response = CarModelViewset.as_view({'post':'create'})(request)
+        response = CarModelViewSet.as_view({'post':'create'})(request)
         car = Car.objects.first()
         serializer = CarModelSerializer(car, context={'request':request})
 
@@ -53,7 +53,7 @@ class TestCarModelViewset:
             },
         }
         request = api_rf.post(reverse('car-list'), data=data)
-        response = CarModelViewset.as_view({'post':'create'})(request)
+        response = CarModelViewSet.as_view({'post':'create'})(request)
         car = Car.objects.first()
         serializer = CarModelSerializer(car, context={'request':request})
 
@@ -77,7 +77,7 @@ class TestCarModelViewset:
             "model_id": 1
         }
         request = api_rf.post(reverse('car-list'), data=bad_data)
-        response = CarModelViewset.as_view({'post': 'create'})(request)
+        response = CarModelViewSet.as_view({'post': 'create'})(request)
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert  "Provide one of this" in str(response.data)
@@ -95,7 +95,7 @@ class TestCarModelViewset:
             "model_id": 1
         }
         request = api_rf.post(reverse('car-list'), data=bad_data)
-        response = CarModelViewset.as_view({'post': 'create'})(request)
+        response = CarModelViewSet.as_view({'post': 'create'})(request)
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert "Provide one of this" in str(response.data)
 
@@ -112,7 +112,7 @@ class TestCarModelViewset:
             "model_id": car_model.id
         }
         request = api_rf.put(reverse('car-detail', args=(car.id,)), data=data)
-        response = CarModelViewset.as_view({'put': 'update'})(request, pk=car.id)
+        response = CarModelViewSet.as_view({'put': 'update'})(request, pk=car.id)
         car.refresh_from_db()
         assert response.status_code == status.HTTP_200_OK
         assert car.model_id == car_model.id
@@ -121,7 +121,7 @@ class TestCarModelViewset:
     def test_delete_car_view(self, api_rf):
         car = mommy.make(Car)
         request = api_rf.delete(reverse('car-detail', args=(car.id,)))
-        response = CarModelViewset.as_view({'delete': 'destroy'})(request, pk=car.id)
+        response = CarModelViewSet.as_view({'delete': 'destroy'})(request, pk=car.id)
         assert response.status_code == status.HTTP_204_NO_CONTENT
         assert response.data is None
         assert Car.objects.first() is None

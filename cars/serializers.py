@@ -5,7 +5,6 @@ from rest_framework.validators import ValidationError
 from .models import Car, CarModel, Producer
 
 
-
 class ProducerModelSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:

@@ -10,17 +10,21 @@ from .models import Car, CarModel, Producer
 from .serializers import CarModelSerializer, CarModelModelSerializer, ProducerModelSerializer, FileSerializer
 
 
-class CarModelViewset(ModelViewSet):
+class CarModelViewSet(ModelViewSet):
+    '''
+    Create form does not work properly.
+    Valid data can be found in test_views.py file.
+    '''
     serializer_class = CarModelSerializer
     queryset = Car.objects.all()
 
     def get_serializer_class(self):
         if self.action == 'import_models':
             return FileSerializer
-        return super(CarModelViewset, self).get_serializer_class()
+        return super(CarModelViewSet, self).get_serializer_class()
 
     def get_serializer_context(self):
-        context = super(CarModelViewset, self).get_serializer_context()
+        context = super(CarModelViewSet, self).get_serializer_context()
         if self.action == 'update':
             context['fields'] = ('registration_number', 'people_capacity', 'manufacture_year',\
                         'category', 'hybrid_or_electric', 'model_id')
@@ -37,7 +41,8 @@ class CarModelViewset(ModelViewSet):
             # producer_serializer = ProducerModelSerializer(data={'name':row[0]})
             producer,_ = Producer.objects.get_or_create(name=row[0])
             print(producer.id)
-            car_model_serializer = CarModelModelSerializer(data={'producer_id': producer.id, 'name':row[1], 'type':row[2]})
+            car_model_serializer = CarModelModelSerializer(data={'producer_id': producer.id, 'name':row[1],
+                                                                 'type':row[2]})
             if car_model_serializer.is_valid():
                 car_model_serializer.save()
             else:
@@ -45,11 +50,12 @@ class CarModelViewset(ModelViewSet):
 
         return Response({'Succes':True})
 
-class CarModelModelViewset(ModelViewSet):
+
+class CarModelModelViewSet(ModelViewSet):
     serializer_class = CarModelModelSerializer
     queryset = CarModel.objects.all()
 
 
-class ProducerModelViewset(ModelViewSet):
+class ProducerModelViewSet(ModelViewSet):
     serializer_class = ProducerModelSerializer
     queryset = Producer.objects.all()
