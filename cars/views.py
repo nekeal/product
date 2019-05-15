@@ -36,7 +36,8 @@ class CarModelViewset(ModelViewSet):
             row = row.split(', ')
             # producer_serializer = ProducerModelSerializer(data={'name':row[0]})
             producer,_ = Producer.objects.get_or_create(name=row[0])
-            car_model_serializer = CarModelModelSerializer(data={'producer':producer.id, 'name':row[1], 'type':row[2]})
+            print(producer.id)
+            car_model_serializer = CarModelModelSerializer(data={'producer_id': producer.id, 'name':row[1], 'type':row[2]})
             if car_model_serializer.is_valid():
                 car_model_serializer.save()
             else:

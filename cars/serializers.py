@@ -20,6 +20,10 @@ class CarModelModelSerializer(serializers.HyperlinkedModelSerializer):
     def validate_type(self, value):
         return value.capitalize()
 
+    def create(self, validated_data):
+        validated_data['producer_id'] = validated_data['producer_id'].id
+        return super(CarModelModelSerializer, self).create(validated_data)
+
     class Meta:
         model = CarModel
         fields = ('name', 'producer', 'type', 'producer_id', 'url')
@@ -41,7 +45,7 @@ class CarModelSerializer(serializers.HyperlinkedModelSerializer):
             allowed = set(fields)
             existing = set(self.fields.keys())
             for field in existing - allowed:
-                self.fields.pop(field)
+                self.fields[field].read_only = True
 
     def validate(self, attrs):
         if not(any([attrs.get('model'), attrs.get('model_id')])) or all([attrs.get('model'), attrs.get('model_id')]):
@@ -49,6 +53,7 @@ class CarModelSerializer(serializers.HyperlinkedModelSerializer):
         return super(CarModelSerializer, self).validate(attrs)
 
     def update(self, instance, validated_data):
+        validated_data['model_id'] = validated_data['model_id'].id
         return super(CarModelSerializer, self).update(instance, validated_data)
 
     def create(self, validated_data):
